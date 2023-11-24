@@ -1,15 +1,15 @@
 'use client'
 
-import React, { useState, ChangeEvent, useRef, useEffect } from 'react';
+import React, { useState, ChangeEvent, useRef, useEffect } from 'react'
 
-const ChatTextArea = () => {
-    const [message, setMessage] = useState<string>('');
-    const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+const ChatInput = () => {
+    const [message, setMessage] = useState<string>('')
 
+    //Handle Text Are Resize
+    const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
     const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         setMessage(event.target.value);
     }
-
     useEffect(() => {
         if (textAreaRef.current) {
             textAreaRef.current.style.height = 'auto';
@@ -19,6 +19,8 @@ const ChatTextArea = () => {
             textAreaRef.current.style.overflowY = 'scroll';
         }
     }, [message, textAreaRef])
+
+    //Handle Post
 
     return (
         <div className="absolute bottom-0 left-0 w-full pt-2 ">
@@ -47,4 +49,4 @@ const ChatTextArea = () => {
     )
 }
 
-export default ChatTextArea
+export default ChatInput
