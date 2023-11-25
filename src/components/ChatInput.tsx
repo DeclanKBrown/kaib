@@ -1,30 +1,36 @@
 'use client'
-
 import React, { useState, ChangeEvent, useRef, useEffect } from 'react'
+import { useChat } from 'ai/react'
 
 const ChatInput = () => {
-    const [message, setMessage] = useState<string>('')
+    //Vercel AI SDK
+    const { input, handleInputChange, handleSubmit, isLoading, messages } = useChat()
 
     //Handle Text Are Resize
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
-    const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        setMessage(event.target.value);
-    }
     useEffect(() => {
         if (textAreaRef.current) {
-            textAreaRef.current.style.height = 'auto';
-            textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+            textAreaRef.current.style.height = 'auto'
+            textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`
         }
         if (textAreaRef.current && textAreaRef.current.value.trim().length > 0) {
-            textAreaRef.current.style.overflowY = 'scroll';
+            textAreaRef.current.style.overflowY = 'scroll'
         }
-    }, [message, textAreaRef])
+    }, [input, textAreaRef])
 
     //Handle Post
+    const handleKeypress = (e: any) => {
+        // It triggers by pressing the enter key
+        if (e.keyCode == 13 && !e.shiftKey) {
+            e.preventDefault()
+            handleSubmit(e as React.FormEvent<HTMLFormElement>)
+        }
+    }
 
     return (
         <div className="absolute bottom-0 left-0 w-full pt-2 ">
-            <form className="stretch mx-2 flex flex-row gap-3 border border-gray-300 rounded-lg backdrop-blur-2xl last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-2xl xl:max-w-3xl">
+            <form className="stretch mx-2 flex flex-row gap-3 border border-gray-300 rounded-lg backdrop-blur-2xl last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-2xl xl:max-w-3xl"
+                onSubmit={handleSubmit}>
                 <div className="relative flex flex-col h-full flex-1 items-stretch md:flex-col">
                     <div className="flex flex-col w-full py-2 flex-grow md:py-3 md:pl-4 relative ">
                         <textarea
@@ -38,8 +44,9 @@ const ChatInput = () => {
                             }}
                             rows={1}
                             placeholder="Search Knowledge Base..."
-                            value={message}
+                            value={input}
                             onChange={handleInputChange}
+                            onKeyDown={handleKeypress}
                             className="m-0 w-full resize-none pl-2 md:pl-0 bg-transparent outline-none"
                         ></textarea>
                     </div>
