@@ -1,11 +1,7 @@
 'use client'
-import React, { useState, ChangeEvent, useRef, useEffect } from 'react'
-import { useChat } from 'ai/react'
+import React, { useRef, useEffect } from 'react'
 
-const ChatInput = () => {
-    //Vercel AI SDK
-    const { input, handleInputChange, handleSubmit, isLoading, messages } = useChat()
-
+const ChatInput = ({ input, handleInputChange, handleSubmit}: any) => {
     //Handle Text Are Resize
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
     useEffect(() => {
