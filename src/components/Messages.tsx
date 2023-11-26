@@ -1,7 +1,7 @@
 'use client'
-
 import { Message } from 'ai/react'
 import { useRef, useEffect } from "react"
+
 import MessageBox from "./MessageBox"
 
 const Messages = ({ messages }: any) => {

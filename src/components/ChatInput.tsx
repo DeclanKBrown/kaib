@@ -24,7 +24,7 @@ const ChatInput = ({ input, handleInputChange, handleSubmit}: any) => {
     }
 
     return (
-        <div className="absolute bottom-0 left-0 w-full pt-2 ">
+        <div className="absolute bottom-0 left-0 w-full bg-white">
             <form className="stretch mx-2 flex flex-row gap-3 border border-gray-300 rounded-lg backdrop-blur-2xl last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-2xl xl:max-w-3xl"
                 onSubmit={handleSubmit}>
                 <div className="relative flex flex-col h-full flex-1 items-stretch md:flex-col">

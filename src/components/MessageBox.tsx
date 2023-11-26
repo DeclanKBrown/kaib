@@ -1,8 +1,6 @@
 const MessageBox = ({ message }: any) => {
   
     const isUser = message.role === "user"
-
-    console.log(message.content)
   
     return (
       <div className="group w-full text-gray-800 border-b border-black/10">
