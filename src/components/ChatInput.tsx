@@ -1,7 +1,7 @@
 'use client'
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 
-const ChatInput = ({ input, handleInputChange, handleSubmit}: any) => {
+const ChatInput = ({ input, handleInputChange, submitMessage }: any) => {
     //Handle Text Are Resize
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
     useEffect(() => {
@@ -19,14 +19,14 @@ const ChatInput = ({ input, handleInputChange, handleSubmit}: any) => {
         // It triggers by pressing the enter key
         if (e.keyCode == 13 && !e.shiftKey) {
             e.preventDefault()
-            handleSubmit(e as React.FormEvent<HTMLFormElement>)
+            submitMessage(e as React.FormEvent<HTMLFormElement>)
         }
     }
 
     return (
         <div className="absolute bottom-0 left-0 w-full bg-white">
             <form className="stretch mx-2 flex flex-row gap-3 border border-gray-300 rounded-lg backdrop-blur-2xl last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-2xl xl:max-w-3xl"
-                onSubmit={handleSubmit}>
+                onSubmit={submitMessage}>
                 <div className="relative flex flex-col h-full flex-1 items-stretch md:flex-col">
                     <div className="flex flex-col w-full py-2 flex-grow md:py-3 md:pl-4 relative ">
                         <textarea

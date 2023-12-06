@@ -41,3 +41,12 @@ export const uploadAssistantFile = async (file: File) => {
         console.log('uploadAssistantFile', error)
     }
 }
+
+//Create thread
+export const createThread = async () => {
+    try {
+        return await openai.beta.threads.create({})
+    } catch (error) {
+        console.log('createThread', error)
+    }
+}
