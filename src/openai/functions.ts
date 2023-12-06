@@ -1,3 +1,5 @@
+'use server'
+
 import { modelInstructions } from "@/openai/helpers/model-instructions"
 import { openai } from './config'
 
@@ -17,6 +19,7 @@ export const createAssistant = async () => {
     }
 }
 
+//Upload File
 export const uploadAssistantFile = async (file: File) => {
     try {
         //Upload file
@@ -32,7 +35,7 @@ export const uploadAssistantFile = async (file: File) => {
                 file_id: assistantFile.id
             }
         )
-    
+
         return response
     } catch (error) {
         console.log('uploadAssistantFile', error)

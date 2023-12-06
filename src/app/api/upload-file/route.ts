@@ -7,13 +7,17 @@ export async function POST(req: Request) {
         //Get files
         const data = await req.formData()
     
-        data.forEach((file) => {
-            //Upload to firebase storage
-            uploadFirebaseFile(file as File)
-        
-            //Upload to assistant
-            uploadAssistantFile(file as File)
+        const uploadPromises = Array.from(data).map(async ([fieldName, file]) => {
+
+            // Upload to firebase storage
+            await uploadFirebaseFile(file as File)
+
+            // Upload to assistant
+            await uploadAssistantFile(file as File)
         })
+
+        // Wait for all promises to resolve
+        await Promise.all(uploadPromises)
     
         return NextResponse.json({ message: 'Success'}, { status: 200 })
     } catch (error) {

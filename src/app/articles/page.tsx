@@ -1,22 +1,28 @@
 'use client'
 
 import { getFileList } from "@/firebase/functions"
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, ChangeEvent } from "react"
 import toast from "react-hot-toast"
 
 export default function Articles() {
 
     const [articles, setArticles] = useState<string[]>([])
+    const [filteredArticles, setFilteredArticles] = useState<string[]>([])
+    const [loading, setLoading] = useState<boolean>(true)
+    const [uploadStatus, setUploadStatus] = useState<boolean>(false)
 
+    //Fetch Articles
     useEffect(() => {
         async function getFiles() {
             const files = await getFileList()
-            console.log('Files', files)
             setArticles(files)
+            setFilteredArticles(files)
+            setLoading(false)
         }
         getFiles()
-    }, [])
+    }, [uploadStatus])
 
+    //Upload input
     const hiddenFileInput = useRef<HTMLInputElement | null>(null)
 
     const handleClick = () => {
@@ -32,8 +38,9 @@ export default function Articles() {
         }
     }
 
+    //Send file to server
     const handleUpload = async (files: FileList) => {
-
+        setLoading(true)
         // Create a FormData object
         const formData = new FormData()
 
@@ -44,16 +51,29 @@ export default function Articles() {
         try {
             // Send the files to your API route
             const response = await fetch('/api/upload-file', {
-            method: 'POST',
-            body: formData,
+                method: 'POST',
+                body: formData,
             })
-
+            
             if (response.ok) {
                 toast('Success')
             }
         } catch (error) {
-            console.error('handleUpload', error.message)
+            console.error('handleUpload', error)
+        } finally {
+            setUploadStatus(!uploadStatus)
         }
+    }
+
+    //Search 
+    const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
+        const searchTerm = event.target.value.toLowerCase()
+
+        const filteredArticles = articles.filter((article) => (
+            article.toLowerCase().includes(searchTerm)
+        ))
+
+        setFilteredArticles(searchTerm ? filteredArticles : articles)
     }
 
     return (
@@ -76,10 +96,15 @@ export default function Articles() {
                         </div>
                     </div>
                     <div className="flex mb-12">
-                        <input type="text" className="border-2 border-zinc-300 rounded-sm text-sm pl-1 py-1" placeholder="Search"></input>
+                        <input 
+                            type="text" 
+                            className="border-2 border-zinc-300 rounded-sm text-sm pl-1 py-1" 
+                            placeholder="Search"
+                            onChange={(event) => handleSearch(event)}
+                        ></input>
                     </div>
                     <div className="flex flex-col gap-5 hover:bg-zinc-300 rounded-sm pl-1">
-                        {articles.length > 0 && articles.map((article) => (
+                        {filteredArticles.length > 0 && filteredArticles.map((article) => (
                             <h3 key={article}>{article}</h3>
                         ))}
                     </div>
