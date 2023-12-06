@@ -1,5 +1,5 @@
 import app from "./config"
-import { getStorage, ref, listAll } from "firebase/storage"
+import { getStorage, ref, listAll, uploadBytes } from "firebase/storage"
 
 const storage = getStorage(app)
 
@@ -16,3 +16,9 @@ export const getFileList = async () => {
       throw error
     }
   }
+
+//Upload files
+export const uploadFirebaseFile = async (file: File) => {
+    const uploadRef = ref(storage, file.name)
+    await uploadBytes(uploadRef, file)
+}
