@@ -4,11 +4,7 @@ import app from "@/firebase/config"
 
 export async function POST(req: Request) {
     try {
-        const formData = await req.formData()
-    
-        //Get email and password
-        const email = formData.get('email') as string
-        const password = formData.get('password') as string
+        // const formData = await req.formData()
 
         //try log out with firbase
         const auth = getAuth(app)
