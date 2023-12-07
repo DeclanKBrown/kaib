@@ -12,15 +12,15 @@ export default function Signup() {
             <main className="flex flex-1 items-center justify-center">
                 <div className="flex flex-col">
                     <div className="flex items-center pt-5 pb-8 px-5">
-                        <h1 className="text-center font-semibold text-[28px] leading-[1.2] md:text-[28px] md:leading-8 select-none w-[18rem] whitespace-nowrap">Create Your Account</h1>
+                        <h1 className="text-center font-semibold text-[28px] leading-[1.2] md:text-[28px] md:leading-8 select-none w-[20rem] whitespace-nowrap">Create Your Account</h1>
                     </div>
                     <div className="flex flex-col justify-center pb-3 px-5">
                         <div className="w-full">
                             <form className="flex flex-col w-full gap-5">
-                                <input type="email" className="w-full border border-zinc-300 rounded-md h-12 pl-2" placeholder="email">
+                                <input type="email" className="w-full border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="email">
 
                                 </input>
-                                <input type="password" className="w-full border border-zinc-300 rounded-md h-12 pl-2" placeholder="password">
+                                <input type="password" className="w-full border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="password">
 
                                 </input>
                                 <button className="relative flex h-12 items-center justify-center rounded-md text-center text-base font-medium bg-[#3C46FF] text-[#fff] hover:bg-[#0000FF]">
@@ -29,7 +29,7 @@ export default function Signup() {
                             </form>
                         </div>
                         <div className="mt-5 flex justify-center w-full">
-                            <p className="text-center">Already have an account? <Link href='/auth/login' className="text-[#3C46FF] underline">Log in</Link></p>
+                            <p className="text-center text-sm">Already have an account? <Link href='/auth/login' className="text-[#3C46FF]">Log in</Link></p>
                         </div>
                     </div>
                 </div>
