@@ -1,5 +1,4 @@
 'use server'
-
 import app from "./config"
 import { getStorage, ref, listAll, uploadBytes } from "firebase/storage"
 

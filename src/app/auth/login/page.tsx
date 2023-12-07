@@ -1,6 +1,33 @@
+'use client'
+
 import Link from "next/link"
+import { FormEvent } from "react"
+import toast from "react-hot-toast"
 
 export default function Login() {
+
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+
+        const formData = new FormData(event.target as HTMLFormElement)
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                body: formData,
+            })
+    
+            if (res.ok) {
+                toast('Logged in')
+            } else {
+                toast('Invalid credentials')
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error)
+            toast('Error logging in')
+        }
+    }
+
     return (
         <div className="flex min-h-screen w-screen flex-col">
             <header className="flex items-center justify-center pt-10">
@@ -14,14 +41,15 @@ export default function Login() {
                     </div>
                     <div className="flex flex-col justify-center pb-3 px-5">
                         <div className="w-full">
-                            <form className="flex flex-col gap-5">
-                                <input type="email" className="border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="email">
+                            <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+
+                                <input type="email" name="email" className="border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="email">
 
                                 </input>
-                                <input type="password" className="w-full border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="password">
+                                <input type="password" name="password" className="w-full border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="password">
 
                                 </input>
-                                <button className="relative flex h-12 items-center justify-center rounded-md text-center text-base font-medium bg-[#3C46FF] text-[#fff] hover:bg-[#0000FF]">
+                                <button type='submit' className="relative flex h-12 items-center justify-center rounded-md text-center text-base font-medium bg-[#3C46FF] text-[#fff] hover:bg-[#0000FF]">
                                     <div className="relative -top-[1px]">Continue</div>
                                 </button>
                             </form>
