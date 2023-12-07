@@ -1,10 +1,12 @@
 'use client'
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { FormEvent } from "react"
 import toast from "react-hot-toast"
 
 export default function Login() {
+    const router = useRouter()
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -19,6 +21,7 @@ export default function Login() {
     
             if (res.ok) {
                 toast('Logged in')
+                router.push('/')
             } else {
                 toast('Invalid credentials')
             }

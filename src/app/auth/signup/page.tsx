@@ -1,10 +1,12 @@
 'use client'
 
 import Link from "next/link"
+import { useRouter } from 'next/navigation'
 import { FormEvent } from "react"
 import toast from "react-hot-toast"
 
 export default function Signup() {
+    const router = useRouter()
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -19,6 +21,7 @@ export default function Signup() {
     
             if (res.ok) {
                 toast('Signed up')
+                router.push('/organization')
             } 
         } catch (error) {
             console.error('Error submitting form:', error)
