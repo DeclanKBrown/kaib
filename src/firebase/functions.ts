@@ -1,13 +1,10 @@
 'use server'
-
 import app from "./config"
 import { getStorage, ref, listAll, uploadBytes } from "firebase/storage"
 
-const storage = getStorage(app)
-
-const storageRef = ref(storage)
-
 //List all files
+const storage = getStorage(app)
+const storageRef = ref(storage)
 export const getFileList = async () => {
     try {
       const result = await listAll(storageRef)
