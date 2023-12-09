@@ -14,19 +14,19 @@ export default function Login() {
         const formData = new FormData(event.target as HTMLFormElement)
 
         try {
-            const res = await fetch('/api/auth/login', {
+            const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 body: formData,
             })
     
-            if (res.ok) {
+            if (response.ok) {
                 toast('Logged in')
                 router.push('/')
             } else {
                 toast('Invalid credentials')
             }
         } catch (error) {
-            console.error('Error submitting form:', error)
+            console.error('Error logging in:', error)
             toast('Error logging in')
         }
     }

@@ -1,11 +1,11 @@
 'use client'
 
 import Link from "next/link"
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation"
 import { FormEvent } from "react"
 import toast from "react-hot-toast"
 
-export default function Signup() {
+export default function CreateOrganisation() {
     const router = useRouter()
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -14,20 +14,20 @@ export default function Signup() {
         const formData = new FormData(event.target as HTMLFormElement)
 
         try {
-            const response = await fetch('/api/auth/signup', {
+            const res = await fetch('/api/organisation/create', {
                 method: 'POST',
                 body: formData,
             })
-    
-            if (response.ok) {
-                toast('Signed up')
-                router.push('/organisation')
-            } 
+
+            if (res.ok) {
+                toast('Organisation created')
+                router.push('/')
+            }
         } catch (error) {
-            console.error('Error signing up', error)
-            toast('Error signing up')
+            console.error('Error creating organisation', error)
+            toast('Error creating organisation')
         }
-    }
+    } 
 
     return (
         <div className="flex min-h-screen w-screen flex-col">
@@ -37,22 +37,20 @@ export default function Signup() {
             </header>
             <main className="flex flex-1 items-center justify-center">
                 <div className="flex flex-col">
-                    <div className="flex items-center pt-5 pb-8 px-5">
-                        <h1 className="text-center font-semibold text-[28px] leading-[1.2] md:text-[28px] md:leading-8 select-none w-[20rem] whitespace-nowrap">Create Your Account</h1>
+                    <div className="flex items-center pt-5 pb-14 px-5">
+                        <h1 className="text-center font-semibold text-[28px] leading-[1.2] md:text-[28px] md:leading-8 select-none w-[23rem] whitespace-nowrap">Create Organisation</h1>
                     </div>
                     <div className="flex flex-col justify-center pb-3 px-5">
                         <div className="w-full">
                             <form className="flex flex-col w-full gap-5" onSubmit={handleSubmit}>
-                                <input type="name" name='name' className="w-full border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="name"></input>
-                                <input type="email" name='email' className="w-full border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="email"></input>
-                                <input type="password" name='password' className="w-full border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="password"></input>
+                                <input type="name" name='organisationName' className="w-full border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="Organisation Name"></input>
                                 <button type='submit' className="relative flex h-12 items-center justify-center rounded-md text-center text-base font-medium bg-[#3C46FF] text-[#fff] hover:bg-[#0000FF]">
-                                    <div className="relative -top-[1px]">Continue</div>
+                                    <div className="relative -top-[1px]">Create</div>
                                 </button>
                             </form>
                         </div>
                         <div className="mt-5 flex justify-center w-full">
-                            <p className="text-center text-sm">Already have an account? <Link href='/auth/login' className="text-[#3C46FF]">Log in</Link></p>
+                            <p className="text-center text-sm">Already apart of an organisation? <Link href='/organisation/join' className="text-[#3C46FF]">Join</Link></p>
                         </div>
                     </div>
                 </div>

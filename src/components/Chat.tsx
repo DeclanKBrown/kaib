@@ -1,7 +1,7 @@
 'use client'
 import ChatInput from './ChatInput'
 import Messages from './Messages'
-import { createThread } from '@/openai/functions'
+import { createThread } from '@/lib/openai/functions'
 import React, { useEffect, useState } from 'react'
 import { experimental_useAssistant } from 'ai/react'
 
