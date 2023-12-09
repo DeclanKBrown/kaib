@@ -5,6 +5,13 @@ import { useRouter } from 'next/navigation'
 import { FormEvent } from "react"
 import toast from "react-hot-toast"
 
+import { browserSessionPersistence, createUserWithEmailAndPassword, getAuth, setPersistence, updateProfile } from "firebase/auth"
+import app from "@/lib/firebase/config"
+import { doc, getFirestore, setDoc } from "firebase/firestore"
+
+//Initialize firestore
+const db = getFirestore(app)
+
 export default function Signup() {
     const router = useRouter()
 
@@ -14,15 +21,29 @@ export default function Signup() {
         const formData = new FormData(event.target as HTMLFormElement)
 
         try {
-            const response = await fetch('/api/auth/signup', {
-                method: 'POST',
-                body: formData,
+            //Get form data
+            const name = formData.get('name') as string
+            const email = formData.get('email') as string
+            const password = formData.get('password') as string
+            
+            //sign up with firbase
+            const auth = getAuth(app)
+            setPersistence(auth, browserSessionPersistence)
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+
+            // Update user profile
+            await updateProfile(userCredential.user, { displayName: name })
+
+            // Create user in Firestore with uid = fireauth uid
+            await setDoc(doc(db, "user", userCredential.user.uid), {
+                name: name,
+                email: email,
+                organisationId: null
             })
-    
-            if (response.ok) {
-                toast('Signed up')
-                router.push('/organisation')
-            } 
+
+            router.push('/organisation')
+            toast('Signed up')
+            
         } catch (error) {
             console.error('Error signing up', error)
             toast('Error signing up')
