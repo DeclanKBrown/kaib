@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation"
 import { FormEvent } from "react"
 import toast from "react-hot-toast"
 
+import app from "@/lib/firebase/config" 
+import { collection, addDoc, getFirestore, updateDoc, doc } from "firebase/firestore"
+import { getAuth } from "firebase/auth"
+
+//Initialize firestore
+const db = getFirestore(app)
+
 export default function CreateOrganisation() {
     const router = useRouter()
 
@@ -14,14 +21,37 @@ export default function CreateOrganisation() {
         const formData = new FormData(event.target as HTMLFormElement)
 
         try {
-            const res = await fetch('/api/organisation/create', {
-                method: 'POST',
-                body: formData,
-            })
+            //Get current user
+            const auth = getAuth(app)
+            const user = auth.currentUser
 
-            if (res.ok) {
-                toast('Organisation created')
-                router.push('/')
+            if (user !== null) {
+                //Get organisation name
+                const organisationName = formData.get('organisationName') as string
+    
+                //send to api - create openai assistant
+                const response = await fetch('/api/organisation/create', {
+                    method: 'POST',
+                    body: formData,
+                })
+
+                const assistantId = await response.json()
+    
+                if (response.ok) {
+                    //Create organisation and store assistant id
+                    const docRef = await addDoc(collection(db, "organisation"), {
+                        assistantId: assistantId,
+                        name: organisationName
+                    })
+                    
+                    //save org id against user
+                    await updateDoc(doc(db, 'user', user.uid), {
+                        organisationId: docRef.id
+                    })
+    
+                    toast('Organisation created')
+                    router.push('/')
+                }
             }
         } catch (error) {
             console.error('Error creating organisation', error)
