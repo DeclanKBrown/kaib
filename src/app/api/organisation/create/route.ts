@@ -5,7 +5,7 @@ import { modelInstructions } from "@/lib/openai/helpers/model-instructions"
 
 import app from "@/lib/firebase/config" 
 import { collection, addDoc, getFirestore, updateDoc, doc } from "firebase/firestore"
-import { getAuth, onAuthStateChanged } from "firebase/auth"
+import { getAuth } from "firebase/auth"
 
 // Create an OpenAI API client 
 const openai = new OpenAI({
