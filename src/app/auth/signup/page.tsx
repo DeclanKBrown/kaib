@@ -14,17 +14,17 @@ export default function Signup() {
         const formData = new FormData(event.target as HTMLFormElement)
 
         try {
-            const res = await fetch('/api/auth/signup', {
+            const response = await fetch('/api/auth/signup', {
                 method: 'POST',
                 body: formData,
             })
     
-            if (res.ok) {
+            if (response.ok) {
                 toast('Signed up')
                 router.push('/organization')
             } 
         } catch (error) {
-            console.error('Error submitting form:', error)
+            console.error('Error signing up', error)
             toast('Error signing up')
         }
     }

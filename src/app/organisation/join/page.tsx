@@ -17,7 +17,7 @@ export default function LinkOrganisation() {
                     <div className="flex flex-col justify-center pb-3 px-5">
                         <div className="w-full">
                             <form className="flex flex-col w-full gap-5">
-                                <input type="name" name='name' className="w-full border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="Organisation name"></input>
+                                <input type="name" name='organisationName' className="w-full border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="Organisation Name"></input>
                                 <button type='submit' className="relative flex h-12 items-center justify-center rounded-md text-center text-base font-medium bg-[#3C46FF] text-[#fff] hover:bg-[#0000FF]">
                                     <div className="relative -top-[1px]">Join</div>
                                 </button>

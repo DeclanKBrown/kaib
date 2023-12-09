@@ -1,8 +1,34 @@
 'use client'
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { FormEvent } from "react"
+import toast from "react-hot-toast"
 
 export default function CreateOrganisation() {
+    const router = useRouter()
+
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+
+        const formData = new FormData(event.target as HTMLFormElement)
+
+        try {
+            const res = await fetch('/api/organisation/create', {
+                method: 'POST',
+                body: formData,
+            })
+
+            if (res.ok) {
+                toast('Organisation created')
+                router.push('/')
+            }
+        } catch (error) {
+            console.error('Error creating organisation', error)
+            toast('Error creating organisation')
+        }
+    } 
+
     return (
         <div className="flex min-h-screen w-screen flex-col">
             <header className="flex items-center justify-center pt-10">
@@ -16,8 +42,8 @@ export default function CreateOrganisation() {
                     </div>
                     <div className="flex flex-col justify-center pb-3 px-5">
                         <div className="w-full">
-                            <form className="flex flex-col w-full gap-5">
-                                <input type="name" name='name' className="w-full border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="Organisation name"></input>
+                            <form className="flex flex-col w-full gap-5" onSubmit={handleSubmit}>
+                                <input type="name" name='organisationName' className="w-full border border-zinc-300 rounded-md h-12 pl-4 outline-none focus:border-[#3C46FF]" placeholder="Organisation Name"></input>
                                 <button type='submit' className="relative flex h-12 items-center justify-center rounded-md text-center text-base font-medium bg-[#3C46FF] text-[#fff] hover:bg-[#0000FF]">
                                     <div className="relative -top-[1px]">Create</div>
                                 </button>
