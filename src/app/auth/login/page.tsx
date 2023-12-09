@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation"
 import { FormEvent } from "react"
 import toast from "react-hot-toast"
 
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth"
+import app from "@/lib/firebase/config"
+
 export default function Login() {
     const router = useRouter()
 
@@ -14,17 +17,17 @@ export default function Login() {
         const formData = new FormData(event.target as HTMLFormElement)
 
         try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                body: formData,
-            })
+             //Get email and password
+            const email = formData.get('email') as string
+            const password = formData.get('password') as string
+
+            //try log in with firbase
+            const auth = getAuth(app)
+            await signInWithEmailAndPassword(auth, email, password)
     
-            if (response.ok) {
-                toast('Logged in')
-                router.push('/')
-            } else {
-                toast('Invalid credentials')
-            }
+            toast('Logged in')
+            router.push('/')
+
         } catch (error) {
             console.error('Error logging in:', error)
             toast('Error logging in')
