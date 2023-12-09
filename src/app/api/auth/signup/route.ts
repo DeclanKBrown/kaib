@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server"
-import { createUserWithEmailAndPassword, getAuth, updateProfile } from "firebase/auth"
-import app from "@/firebase/config"
+import { browserSessionPersistence, createUserWithEmailAndPassword, getAuth, setPersistence, updateProfile } from "firebase/auth"
+import app from "@/lib/firebase/config"
+import { doc, getFirestore, setDoc } from "firebase/firestore"
+
+//Initialize firestore
+const db = getFirestore(app)
 
 export async function POST(req: Request) {
     try {
@@ -13,15 +17,21 @@ export async function POST(req: Request) {
 
         //try sign up with firbase
         const auth = getAuth(app)
-        const userId = await createUserWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-            await updateProfile(userCredential.user, { displayName: name })
+        setPersistence(auth, browserSessionPersistence)
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password)
 
-            return userCredential.user 
+        // Update user profile
+        await updateProfile(userCredential.user, { displayName: name })
+
+        // Create user in Firestore with uid = fireauth uid
+        await setDoc(doc(db, "user", userCredential.user.uid), {
+            name: name,
+            email: email,
+            organisationId: null
         })
 
         //Return response
-        return NextResponse.json({ message: userId }, { status: 201 })
+        return NextResponse.json({ message: userCredential }, { status: 201 })
 
     } catch (error) {
         console.error(error)

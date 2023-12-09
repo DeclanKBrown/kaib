@@ -1,6 +1,6 @@
 'use client'
 
-import { getFileList } from "@/firebase/functions"
+import { getFileList } from "@/lib/firebase/functions"
 import { useEffect, useState, useRef, ChangeEvent } from "react"
 import toast from "react-hot-toast"
 import Layout from "@/components/layouts/dashboardLayout"

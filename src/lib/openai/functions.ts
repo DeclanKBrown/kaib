@@ -1,6 +1,6 @@
 'use server'
 
-import { modelInstructions } from "@/openai/helpers/model-instructions"
+import { modelInstructions } from "@/lib/openai/helpers/model-instructions"
 import { openai } from './config'
 
 //Create Assistant

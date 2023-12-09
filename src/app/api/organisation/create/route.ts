@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
 
 import OpenAI from 'openai'
-import { modelInstructions } from "@/openai/helpers/model-instructions"
+import { modelInstructions } from "@/lib/openai/helpers/model-instructions"
 
-import app from "@/firebase/config" 
-import { collection, addDoc, getFirestore } from "firebase/firestore"
+import app from "@/lib/firebase/config" 
+import { collection, addDoc, getFirestore, updateDoc, doc } from "firebase/firestore"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
 
 // Create an OpenAI API client 
 const openai = new OpenAI({
@@ -21,23 +22,32 @@ export async function POST(req: Request) {
         //Get organisation name
         const organisationName = formData.get('organisationName') as string
 
-        //Create assistant
-        const assistant = await openai.beta.assistants.create({
-            name: organisationName,
-            instructions: modelInstructions,
-            tools: [{ type: "retrieval" }],
-            model: "gpt-3.5-turbo-1106"
-        })
-
         //Get authenticated user
+        const auth = getAuth(app)
+        const user = auth.currentUser
+        
+        if (user !== null) {
+            // Create assistant
+            const assistant = await openai.beta.assistants.create({
+                name: organisationName,
+                instructions: modelInstructions,
+                tools: [{ type: "retrieval" }],
+                model: "gpt-3.5-turbo-1106"
+            })
 
-        //Create organisation and store assistant id
-        const docRef = await addDoc(collection(db, "organisation"), {
-            assistantId: assistant.id,
-            name: organisationName
-        })
-
-        //save org id against user
+            //Create organisation and store assistant id
+            const docRef = await addDoc(collection(db, "organisation"), {
+                assistantId: assistant.id,
+                name: organisationName
+            })
+            
+            //save org id against user
+            await updateDoc(doc(db, 'user', user.uid), {
+                organisationId: docRef.id
+            })
+        } else {
+            throw new Error('User not authenticated')
+        }
 
         //Return response
         return NextResponse.json({ message: 'success' }, { status: 201 })

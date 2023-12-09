@@ -21,7 +21,7 @@ export default function Signup() {
     
             if (response.ok) {
                 toast('Signed up')
-                router.push('/organization')
+                router.push('/organisation')
             } 
         } catch (error) {
             console.error('Error signing up', error)

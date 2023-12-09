@@ -1,5 +1,5 @@
-import { uploadFirebaseFile } from "@/firebase/functions"
-import { uploadAssistantFile } from "@/openai/functions"
+import { uploadFirebaseFile } from "@/lib/firebase/functions"
+import { uploadAssistantFile } from "@/lib/openai/functions"
 import { NextResponse } from "next/server"
 
 export async function POST(req: Request) {
