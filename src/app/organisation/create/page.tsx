@@ -46,7 +46,8 @@ export default function CreateOrganisation() {
                     
                     //save org id against user
                     await updateDoc(doc(db, 'user', user.uid), {
-                        organisationId: docRef.id
+                        organisationId: docRef.id,
+                        role: 'organisation admin'
                     })
     
                     toast('Organisation created')

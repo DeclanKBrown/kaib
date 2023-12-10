@@ -22,7 +22,7 @@ export default function UserInfo() {
             const setOrganisation = async () => {
                 const userSnap = await getDoc(doc(db, "user", user.uid))
 
-                setUserRole('admin') //FIX ME
+                setUserRole(userSnap.get('role'))
     
                 const organisationSnap = await getDoc(doc(db, 'organisation', userSnap.get('organisationId')))
 
@@ -30,7 +30,6 @@ export default function UserInfo() {
             }
             setOrganisation()
         }
-
     })
     }, [auth])
 

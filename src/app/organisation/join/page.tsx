@@ -45,7 +45,8 @@ export default function LinkOrganisation() {
 
             //save org id against user
             await updateDoc(doc(db, 'user', user.uid), {
-                organisationId: organisationToken
+                organisationId: organisationToken,
+                role: 'user'
             })
 
             toast('Organisation joined')

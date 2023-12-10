@@ -7,6 +7,10 @@ import toast from "react-hot-toast"
 
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth"
 import app from "@/lib/firebase/config"
+import { doc, getDoc, getFirestore, } from "firebase/firestore"
+
+//Initialize firestore
+const db = getFirestore(app)
 
 export default function Login() {
     const router = useRouter()
@@ -24,13 +28,31 @@ export default function Login() {
             //try log in with firbase
             const auth = getAuth(app)
             await signInWithEmailAndPassword(auth, email, password)
-    
-            toast('Logged in')
-            router.push('/')
 
-        } catch (error) {
-            console.error('Error logging in:', error)
-            toast('Error logging in')
+            toast('Logged in')
+
+            const user = auth.currentUser
+
+            if (user !== null) {
+                //Get user
+                const userRef = doc(db, 'user', user.uid)
+                const userSnap = await getDoc(userRef)
+
+                //route based on user role
+                if (userSnap.get('role') === 'no organisation') {
+                    router.push('/organisation')
+                } else {
+                    router.push('/')
+                }
+            }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error('Error logging in', error)
+                toast(error.message)
+            } else {
+                console.error('Unexpected error:', error)
+                toast('An unexpected error occurred.')
+            }
         }
     }
 
