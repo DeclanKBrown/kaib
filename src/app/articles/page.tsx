@@ -4,13 +4,15 @@ import { getFileList } from "@/lib/firebase/functions"
 import { useEffect, useState, useRef, ChangeEvent } from "react"
 import toast from "react-hot-toast"
 import Layout from "@/components/layouts/dashboardLayout"
+import { getAuth } from "firebase/auth"
+import app from "@/lib/firebase/config"
 
 export default function Articles() {
 
     const [articles, setArticles] = useState<string[]>([])
     const [filteredArticles, setFilteredArticles] = useState<string[]>([])
     const [loading, setLoading] = useState<boolean>(true)
-    const [uploadStatus, setUploadStatus] = useState<boolean>(false)
+    const [uploadSwitch, setUploadSwitch] = useState<boolean>(false)
 
     //Fetch Articles
     useEffect(() => {
@@ -21,7 +23,7 @@ export default function Articles() {
             setLoading(false)
         }
         getFiles()
-    }, [uploadStatus])
+    }, [uploadSwitch])
 
     //Upload input
     const hiddenFileInput = useRef<HTMLInputElement | null>(null)
@@ -42,15 +44,27 @@ export default function Articles() {
     //Send file to server
     const handleUpload = async (files: FileList) => {
         setLoading(true)
-        // Create a FormData object
-        const formData = new FormData()
-
-        for (let i = 0; i < files.length; i++) {
-            formData.append(`file${i}`, files[i])
-        }
-
         try {
-            // Send the files to your API route
+            //Get current user
+            const auth = getAuth(app)
+            const user = auth.currentUser
+    
+            //Throw error if not authenticated
+            if (user === null) {
+                throw new Error('User not authenticated')
+            }
+
+            // Create a FormData object
+            const formData = new FormData()
+
+            //Append files to form data
+            for (let i = 0; i < files.length; i++) {
+                formData.append('file', files[i])
+            }
+
+            //Get organisation id from user
+
+            // Send the files to your API route | upload to openai
             const response = await fetch('/api/upload-file', {
                 method: 'POST',
                 body: formData,
@@ -59,10 +73,16 @@ export default function Articles() {
             if (response.ok) {
                 toast('Success')
             }
-        } catch (error) {
-            console.error('handleUpload', error)
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error('handleUpload', error)
+                toast(error.message)
+            } else {
+                console.error('Unexpected error:', error)
+                toast('An unexpected error occurred.')
+            }
         } finally {
-            setUploadStatus(!uploadStatus)
+            setUploadSwitch(!uploadSwitch)
         }
     }
 
@@ -93,7 +113,8 @@ export default function Articles() {
                                     type="file" 
                                     className="hidden" 
                                     ref={hiddenFileInput}
-                                    onChange={handleChange}     
+                                    onChange={handleChange}  
+                                    multiple   
                                 ></input>
                             </div>
                         </div>

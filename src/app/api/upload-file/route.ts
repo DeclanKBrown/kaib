@@ -1,19 +1,29 @@
-import { uploadFirebaseFile } from "@/lib/firebase/functions"
-import { uploadAssistantFile } from "@/lib/openai/functions"
 import { NextResponse } from "next/server"
+import { openai } from "@/lib/openai/config"
 
 export async function POST(req: Request) {
     try {
         //Get files
         const data = await req.formData()
+
+        //Get files 
+        const files: File[] = data.getAll('file') as File[]
     
-        const uploadPromises = Array.from(data).map(async ([fieldName, file]) => {
+        //Iterate through files an upload
+        const uploadPromises = files.map(async (file) => {
+            //Upload file
+            const assistantFile = await openai.files.create({
+                file: file,
+                purpose: "assistants",
+            })
 
-            // Upload to firebase storage
-            await uploadFirebaseFile(file as File)
-
-            // Upload to assistant
-            await uploadAssistantFile(file as File)
+            //Attach to assistant
+            await openai.beta.assistants.files.create(
+                'asst_jbnJAl55xkShiuHRrNUTR3P0', //FIX ME
+                {
+                    file_id: assistantFile.id
+                }
+            )
         })
 
         // Wait for all promises to resolve

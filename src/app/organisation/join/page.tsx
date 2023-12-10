@@ -6,7 +6,7 @@ import { FormEvent } from "react"
 import toast from "react-hot-toast"
 
 import app from "@/lib/firebase/config" 
-import { collection, addDoc, getFirestore, updateDoc, doc, getDoc } from "firebase/firestore"
+import { getFirestore, updateDoc, doc, getDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 
 
