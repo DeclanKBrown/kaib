@@ -2,21 +2,40 @@
 
 import app from "@/lib/firebase/config"
 import { User, getAuth, onAuthStateChanged } from "firebase/auth"
+import { doc, getDoc, getFirestore } from "firebase/firestore"
 import { useEffect, useState } from "react"
+
+const db = getFirestore(app)
 
 export default function UserInfo() {
     const [currentUser, setCurrentUser] = useState<User | null>(null)
+    const [organisationName, setOrganisationName] = useState<string | null>(null)
+    const [userRole, setUserRole] = useState<string | null>(null)
 
     const auth = getAuth(app)
 
     useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-        setCurrentUser(user)
+        if (user) {
+            setCurrentUser(user)
+            
+            const setOrganisation = async () => {
+                const userSnap = await getDoc(doc(db, "user", user.uid))
+
+                setUserRole('admin') //FIX ME
+    
+                const organisationSnap = await getDoc(doc(db, 'organisation', userSnap.get('organisationId')))
+
+                setOrganisationName(organisationSnap.get('name'))
+            }
+            setOrganisation()
+        }
+
     })
     }, [auth])
 
     return (
-        currentUser !== null ? (
+        currentUser !== null && organisationName !== null ? (
             <div className="flex w-full items-center">
                 <div className="flex w-full items-center gap-2 rounded-lg p-2 text-sm hover:bg-zinc-300">
                     <div className="flex-shrink-0">
@@ -27,6 +46,7 @@ export default function UserInfo() {
                     </div>
                     <div className="relative -top-px grow -space-y-px overflow-hidden text-ellipsis whitespace-nowrap text-left text-gray-700">
                         <div className="font-semibold">{currentUser?.displayName}</div>
+                        <div className="font-normal">{organisationName + ' ' + userRole}</div>
                     </div>
                 </div>
             </div>
