@@ -6,6 +6,9 @@ import toast from "react-hot-toast"
 import Layout from "@/components/layouts/dashboardLayout"
 import { getAuth } from "firebase/auth"
 import app from "@/lib/firebase/config"
+import { doc, getDoc, getFirestore } from "firebase/firestore"
+
+const db = getFirestore(app)
 
 export default function Articles() {
 
@@ -57,12 +60,24 @@ export default function Articles() {
             // Create a FormData object
             const formData = new FormData()
 
+            //Get current user from db
+            const userSnap = await getDoc(doc(db, "user", user.uid))
+
+            //get organisation id from user
+            const organisationId = userSnap.get('organisationId')
+
+            //get organisation 
+            const organisationSnap = await getDoc(doc(db, 'organisation', organisationId))
+
+            //get organisation name
+            const assistantId = organisationSnap.get('assistantId')
+
+            formData.append('assistantId', assistantId)
+
             //Append files to form data
             for (let i = 0; i < files.length; i++) {
                 formData.append('file', files[i])
             }
-
-            //Get organisation id from user
 
             // Send the files to your API route | upload to openai
             const response = await fetch('/api/upload-file', {

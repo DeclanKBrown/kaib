@@ -8,6 +8,9 @@ export async function POST(req: Request) {
 
         //Get files 
         const files: File[] = data.getAll('file') as File[]
+
+        //get assistant id
+        const assistantId: string = data.get('assistantId') as string
     
         //Iterate through files an upload
         const uploadPromises = files.map(async (file) => {
@@ -19,7 +22,7 @@ export async function POST(req: Request) {
 
             //Attach to assistant
             await openai.beta.assistants.files.create(
-                'asst_jbnJAl55xkShiuHRrNUTR3P0', //FIX ME
+                assistantId,
                 {
                     file_id: assistantFile.id
                 }
