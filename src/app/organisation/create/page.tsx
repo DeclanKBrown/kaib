@@ -40,7 +40,7 @@ export default function CreateOrganisation() {
                 if (response.ok) {
                     //Create organisation and store assistant id
                     const docRef = await addDoc(collection(db, "organisation"), {
-                        assistantId: assistantId,
+                        assistantId: assistantId.message,
                         name: organisationName
                     })
                     
