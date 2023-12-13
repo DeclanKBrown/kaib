@@ -1,5 +1,10 @@
 'use client'
+import app from '@/lib/firebase/config'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { doc, getDoc, getFirestore } from 'firebase/firestore'
 import React, { useRef, useEffect, useState } from 'react'
+
+const db = getFirestore(app)
 
 const ChatInput = ({ input, handleInputChange, submitMessage }: any) => {
     //Handle Text Are Resize
@@ -14,12 +19,39 @@ const ChatInput = ({ input, handleInputChange, submitMessage }: any) => {
         }
     }, [input, textAreaRef])
 
+    //Get user organisation
+    const auth = getAuth(app)
+
+    const [assistantId, setAssistantId] = useState<string>()
+
+    useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {            
+            const getAssistantId = async () => {
+                const userSnap = await getDoc(doc(db, "user", user.uid))
+    
+                const organisationSnap = await getDoc(doc(db, 'organisation', userSnap.get('organisationId')))
+
+                console.log(organisationSnap.get('assistantId'))
+
+                setAssistantId(organisationSnap.get('assistantId'))
+            }
+            getAssistantId()
+        }
+    })
+    }, [auth])
+
     //Handle Post
     const handleKeypress = (e: any) => {
         // It triggers by pressing the enter key
         if (e.keyCode == 13 && !e.shiftKey) {
             e.preventDefault()
-            submitMessage(e as React.FormEvent<HTMLFormElement>)
+            const requestOptions = {
+                data: {
+                    assistantId: assistantId
+                }
+            }
+            submitMessage(e as React.FormEvent<HTMLFormElement>, requestOptions)
         }
     }
 

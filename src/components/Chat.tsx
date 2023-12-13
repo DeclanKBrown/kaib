@@ -20,9 +20,9 @@ const Chat = () => {
   }, [])
 
    //Vercel AI SDK
-  const { input, handleInputChange, submitMessage, messages } = experimental_useAssistant({
+  const { input, handleInputChange, submitMessage, messages  } = experimental_useAssistant({
     api: 'api/chat',
-    threadId: threadId
+    threadId: threadId,
   })
 
   return (
