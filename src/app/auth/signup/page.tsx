@@ -38,7 +38,8 @@ export default function Signup() {
             await setDoc(doc(db, "user", userCredential.user.uid), {
                 name: name,
                 email: email,
-                organisationId: null
+                organisationId: null,
+                role: 'no organisation'
             })
 
             router.push('/organisation')

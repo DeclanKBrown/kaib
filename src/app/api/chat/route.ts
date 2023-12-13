@@ -16,6 +16,7 @@ export async function POST(req: Request) {
         const input: {
         threadId: string | null
         message: string
+        data: { assistantId: string }
         } = await req.json()
 
         // Create a thread if needed
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
             // Run the assistant on the thread
             const run = await openai.beta.threads.runs.create(threadId, {
                 assistant_id:
-                process.env.ASSISTANT_ID ??
+                input.data.assistantId ??
                 (() => {
                     throw new Error('ASSISTANT_ID is not set')
                 })(),
@@ -54,7 +55,8 @@ export async function POST(req: Request) {
                 run.status === 'failed' ||
                 run.status === 'expired'
                 ) {
-                throw new Error(run.status)
+                    console.error(run.status)
+                    throw new Error(run.status)
                 }
                 
                 if (run.status === 'requires_action') {
