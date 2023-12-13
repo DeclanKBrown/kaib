@@ -32,15 +32,13 @@ const ChatInput = ({ input, handleInputChange, submitMessage }: any) => {
     
                 const organisationSnap = await getDoc(doc(db, 'organisation', userSnap.get('organisationId')))
 
-                console.log(organisationSnap.get('assistantId'))
-
                 setAssistantId(organisationSnap.get('assistantId'))
             }
             getAssistantId()
         }
     })
     }, [auth])
-
+ 
     //Handle Post
     const handleKeypress = (e: any) => {
         // It triggers by pressing the enter key
