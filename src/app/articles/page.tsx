@@ -7,10 +7,11 @@ import Layout from "@/components/layouts/dashboardLayout"
 import { getAuth } from "firebase/auth"
 import app from "@/lib/firebase/config"
 import { doc, getDoc, getFirestore } from "firebase/firestore"
+import isAuth from "@/lib/auth/auth"
 
 const db = getFirestore(app)
 
-export default function Articles() {
+const Articles = () => {
 
     const [articles, setArticles] = useState<string[]>([])
     const [filteredArticles, setFilteredArticles] = useState<string[]>([])
@@ -152,3 +153,5 @@ export default function Articles() {
         </Layout>
     )
 }
+
+export default isAuth(Articles)

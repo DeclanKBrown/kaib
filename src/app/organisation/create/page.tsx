@@ -8,11 +8,12 @@ import toast from "react-hot-toast"
 import app from "@/lib/firebase/config" 
 import { collection, addDoc, getFirestore, updateDoc, doc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
+import isAuth from "@/lib/auth/auth"
 
 //Initialize firestore
 const db = getFirestore(app)
 
-export default function CreateOrganisation() {
+const CreateOrganisation = () => {
     const router = useRouter()
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -89,3 +90,5 @@ export default function CreateOrganisation() {
         </div>
     )
 }
+
+export default isAuth(CreateOrganisation)
