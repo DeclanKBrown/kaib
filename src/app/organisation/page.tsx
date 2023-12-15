@@ -1,8 +1,9 @@
 'use client'
 
+import isAuth from "@/lib/auth/auth"
 import Link from "next/link"
 
-export default function Organisation() {
+const Organisation = () => {
     return (
         <div className="flex min-h-screen w-screen flex-col">
             <header className="flex items-center justify-center pt-10">
@@ -31,3 +32,5 @@ export default function Organisation() {
         </div>
     )
 }
+
+export default isAuth(Organisation)

@@ -1,10 +1,14 @@
+'use client'
 import Chat from '@/components/Chat'
 import Layout from '@/components/layouts/dashboardLayout'
+import isAuth from '@/lib/auth/auth'
 
-export default function Home() {
+const Home = () => {
   return (
     <Layout>
       <Chat />
     </Layout>
   )
 }
+
+export default isAuth(Home)
