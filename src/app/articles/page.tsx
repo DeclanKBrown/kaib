@@ -8,6 +8,7 @@ import { getAuth } from "firebase/auth"
 import app from "@/lib/firebase/config"
 import { doc, getDoc, getFirestore } from "firebase/firestore"
 import isAuth from "@/lib/auth/auth"
+import Link from "next/link"
 
 const db = getFirestore(app)
 
@@ -30,77 +31,77 @@ const Articles = () => {
     }, [uploadSwitch])
 
     //Upload input
-    const hiddenFileInput = useRef<HTMLInputElement | null>(null)
+    // const hiddenFileInput = useRef<HTMLInputElement | null>(null)
 
-    const handleClick = () => {
-        if (hiddenFileInput.current) {
-            hiddenFileInput.current.click()
-        }
-    }
+    // const handleClick = () => {
+    //     if (hiddenFileInput.current) {
+    //         hiddenFileInput.current.click()
+    //     }
+    // }
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files: FileList | null = event.target.files
-        if (files) { 
-            handleUpload(files)
-        }
-    }
+    // const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const files: FileList | null = event.target.files
+    //     if (files) { 
+    //         handleUpload(files)
+    //     }
+    // }
 
     //Send file to server
-    const handleUpload = async (files: FileList) => {
-        setLoading(true)
-        try {
-            //Get current user
-            const auth = getAuth(app)
-            const user = auth.currentUser
+    // const handleUpload = async (files: FileList) => {
+    //     setLoading(true)
+    //     try {
+    //         //Get current user
+    //         const auth = getAuth(app)
+    //         const user = auth.currentUser
     
-            //Throw error if not authenticated
-            if (user === null) {
-                throw new Error('User not authenticated')
-            }
+    //         //Throw error if not authenticated
+    //         if (user === null) {
+    //             throw new Error('User not authenticated')
+    //         }
 
-            // Create a FormData object
-            const formData = new FormData()
+    //         // Create a FormData object
+    //         const formData = new FormData()
 
-            //Get current user from db
-            const userSnap = await getDoc(doc(db, "user", user.uid))
+    //         //Get current user from db
+    //         const userSnap = await getDoc(doc(db, "user", user.uid))
 
-            //get organisation id from user
-            const organisationId = userSnap.get('organisationId')
+    //         //get organisation id from user
+    //         const organisationId = userSnap.get('organisationId')
 
-            //get organisation 
-            const organisationSnap = await getDoc(doc(db, 'organisation', organisationId))
+    //         //get organisation 
+    //         const organisationSnap = await getDoc(doc(db, 'organisation', organisationId))
 
-            //get organisation name
-            const assistantId = organisationSnap.get('assistantId')
+    //         //get organisation name
+    //         const assistantId = organisationSnap.get('assistantId')
 
-            formData.append('assistantId', assistantId)
+    //         formData.append('assistantId', assistantId)
 
-            //Append files to form data
-            for (let i = 0; i < files.length; i++) {
-                formData.append('file', files[i])
-            }
+    //         //Append files to form data
+    //         for (let i = 0; i < files.length; i++) {
+    //             formData.append('file', files[i])
+    //         }
 
-            // Send the files to your API route | upload to openai
-            const response = await fetch('/api/upload-file', {
-                method: 'POST',
-                body: formData,
-            })
+    //         // Send the files to your API route | upload to openai
+    //         const response = await fetch('/api/upload-file', {
+    //             method: 'POST',
+    //             body: formData,
+    //         })
             
-            if (response.ok) {
-                toast('Success')
-            }
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.error('handleUpload', error)
-                toast(error.message)
-            } else {
-                console.error('Unexpected error:', error)
-                toast('An unexpected error occurred.')
-            }
-        } finally {
-            setUploadSwitch(!uploadSwitch)
-        }
-    }
+    //         if (response.ok) {
+    //             toast('Success')
+    //         }
+    //     } catch (error: unknown) {
+    //         if (error instanceof Error) {
+    //             console.error('handleUpload', error)
+    //             toast(error.message)
+    //         } else {
+    //             console.error('Unexpected error:', error)
+    //             toast('An unexpected error occurred.')
+    //         }
+    //     } finally {
+    //         setUploadSwitch(!uploadSwitch)
+    //     }
+    // }
 
     //Search 
     const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
@@ -121,17 +122,20 @@ const Articles = () => {
                         <div className="flex items-center justify-between mb-6">
                             <h1 className="text-xl font-mono">Articles</h1>
                             <div className="flex flex-row">
-                                <button 
+                                {/* <button 
                                     className="bg-zinc-300 py-1 px-3 rounded-sm"
                                     onClick={handleClick}
-                                >Add New</button>
-                                <input 
+                                >Add New</button> */}
+                                <Link href={'/articles/new'} className="bg-zinc-300 py-1 px-3 rounded-sm">
+                                        Add New
+                                </Link>
+                                {/* <input 
                                     type="file" 
                                     className="hidden" 
                                     ref={hiddenFileInput}
                                     onChange={handleChange}  
                                     multiple   
-                                ></input>
+                                ></input> */}
                             </div>
                         </div>
                         <div className="flex mb-12">
