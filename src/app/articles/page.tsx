@@ -8,8 +8,10 @@ import { getAuth } from "firebase/auth"
 import app from "@/lib/firebase/config"
 import { doc, getDoc, getFirestore } from "firebase/firestore"
 import isAuth from "@/lib/auth/auth"
+import { getStorage, ref, uploadBytes } from "firebase/storage"
 
 const db = getFirestore(app)
+const storage = getStorage(app)
 
 const Articles = () => {
 
@@ -70,7 +72,7 @@ const Articles = () => {
             //get organisation 
             const organisationSnap = await getDoc(doc(db, 'organisation', organisationId))
 
-            //get organisation name
+            //get assistantId name
             const assistantId = organisationSnap.get('assistantId')
 
             formData.append('assistantId', assistantId)
@@ -78,6 +80,20 @@ const Articles = () => {
             //Append files to form data
             for (let i = 0; i < files.length; i++) {
                 formData.append('file', files[i])
+            }
+
+            //Upload to firebase storage
+            //Get organisation name
+            const organisationName = organisationSnap.get('name')
+            
+            //Get list of files in mapable form
+            const articles: File[] = formData.getAll('file') as File[]
+            
+            //Map through and upload
+            for (const article of articles) {
+                //Ref to storage location
+                const organisationStorageRef = ref(storage, `${organisationName}/${article.name}`)
+                uploadBytes(organisationStorageRef, article)
             }
 
             // Send the files to your API route | upload to openai
