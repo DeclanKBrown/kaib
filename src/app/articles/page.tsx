@@ -8,19 +8,20 @@ import app from "@/lib/firebase/config"
 import { doc, getDoc, getFirestore } from "firebase/firestore"
 import isAuth from "@/lib/auth/auth"
 import { getStorage, listAll, ref, uploadBytes } from "firebase/storage"
+import Article from "@/components/Article"
 
 const db = getFirestore(app)
 const storage = getStorage(app)
 
-interface Article {
+interface ArticleType {
     name: string
     id: string
 }
 
 const Articles = () => {
 
-    const [articles, setArticles] = useState<Article[]>([])
-    const [filteredArticles, setFilteredArticles] = useState<Article[]>([])
+    const [articles, setArticles] = useState<ArticleType[]>([])
+    const [filteredArticles, setFilteredArticles] = useState<ArticleType[]>([])
     const [loading, setLoading] = useState<boolean>(true)
     const [uploadSwitch, setUploadSwitch] = useState<boolean>(false)
 
@@ -56,7 +57,7 @@ const Articles = () => {
                 name: file.name,
                 id: file.fullPath
             }))
-            //Set to sdtate
+            //Set to state
             setArticles(fileObject)
             setFilteredArticles(fileObject)
             setLoading(false)
@@ -105,6 +106,19 @@ const Articles = () => {
             //get organisation 
             const organisationSnap = await getDoc(doc(db, 'organisation', organisationId))
 
+            //get organisation name
+            const organisationName = organisationSnap.get('name')
+
+            //Get files from org folder
+            const organisationFilesRef = ref(storage, organisationName)
+
+            //Get count 
+            const organisationFiles = await listAll(organisationFilesRef)
+
+            if (organisationFiles.items.length > 20) {
+                throw new Error('Maxiumum file number exceeded (20)')
+            }
+
             //get assistantId name
             const assistantId = organisationSnap.get('assistantId')
 
@@ -116,8 +130,6 @@ const Articles = () => {
             }
 
             //Upload to firebase storage
-            //Get organisation name
-            const organisationName = organisationSnap.get('name')
             
             //Get list of files in mapable form
             const articles: File[] = formData.getAll('file') as File[]
@@ -171,7 +183,7 @@ const Articles = () => {
                             <h1 className="text-xl">Articles</h1>
                             <div className="flex flex-row">
                                 <button 
-                                    className="bg-zinc-300 py-1 px-3 rounded-sm"
+                                    className="bg-zinc-300 py-1 px-3 rounded hover:opacity-90"
                                     onClick={handleClick}
                                 >Add New</button>
                                 <input 
@@ -186,14 +198,14 @@ const Articles = () => {
                         <div className="flex mb-12">
                             <input 
                                 type="text" 
-                                className="border-2 border-zinc-300 rounded-sm text-sm pl-1 py-1" 
+                                className="border-2 border-zinc-300 rounded text-sm pl-1 pr-10 py-2 w-72" 
                                 placeholder="Search"
                                 onChange={(event) => handleSearch(event)}
                             ></input>
                         </div>
-                        <div className="flex flex-col gap-5 hover:bg-zinc-300 rounded-sm pl-1">
+                        <div className="flex flex-col rounded-sm pl-1">
                             {filteredArticles.length > 0 && filteredArticles.map((article) => (
-                                <h3 key={article.id}>{article.name}</h3>
+                                <Article key={article.id} article={article} />
                             ))}
                         </div>
                     </div>
