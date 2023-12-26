@@ -119,7 +119,7 @@ const Articles = () => {
                 <div className="relative h-full w-full transition-width flex flex-col overflow-hidden items-stretch flex-1">
                     <div className='flex h-full flex-col px-16 pt-16'>
                         <div className="flex items-center justify-between mb-6">
-                            <h1 className="text-xl font-mono">Articles</h1>
+                            <h1 className="text-xl">Articles</h1>
                             <div className="flex flex-row">
                                 <button 
                                     className="bg-zinc-300 py-1 px-3 rounded-sm"

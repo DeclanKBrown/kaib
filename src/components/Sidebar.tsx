@@ -13,16 +13,16 @@ const Sidebar = () => {
                     <div className="px-2">
                         <Link href='/'>
                             <div className="flex items-center justify-between gap-2 py-2 px-2 mb-6 hover:bg-zinc-300 rounded-lg">
-                                <h2 className="font-mono text-base">New Search</h2>
+                                <h2 className="text-base">New Search</h2>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                             </div>
                         </Link>
                         <div className="flex items-center justify-start py-2 px-2">
-                            <h3 className="font-mono text-xs text-zinc-600">Knowledge Base</h3>
+                            <h3 className="text-xs text-zinc-600">Knowledge Base</h3>
                         </div>
                         <Link href='/articles'>
                             <div className="flex items-center justify-start gap-2 py-1 px-2 hover:bg-zinc-300 rounded-lg">
-                                <h2 className="font-mono text-sm">Articles</h2>
+                                <h2 className="text-sm">Articles</h2>
                             </div>
                         </Link>
                     </div>
