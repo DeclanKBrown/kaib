@@ -1,6 +1,5 @@
 'use client'
 
-import { getFileList } from "@/lib/firebase/functions"
 import { useEffect, useState, useRef, ChangeEvent } from "react"
 import toast from "react-hot-toast"
 import Layout from "@/components/layouts/dashboardLayout"
@@ -8,24 +7,58 @@ import { getAuth } from "firebase/auth"
 import app from "@/lib/firebase/config"
 import { doc, getDoc, getFirestore } from "firebase/firestore"
 import isAuth from "@/lib/auth/auth"
-import { getStorage, ref, uploadBytes } from "firebase/storage"
+import { getStorage, listAll, ref, uploadBytes } from "firebase/storage"
 
 const db = getFirestore(app)
 const storage = getStorage(app)
 
+interface Article {
+    name: string
+    id: string
+}
+
 const Articles = () => {
 
-    const [articles, setArticles] = useState<string[]>([])
-    const [filteredArticles, setFilteredArticles] = useState<string[]>([])
+    const [articles, setArticles] = useState<Article[]>([])
+    const [filteredArticles, setFilteredArticles] = useState<Article[]>([])
     const [loading, setLoading] = useState<boolean>(true)
     const [uploadSwitch, setUploadSwitch] = useState<boolean>(false)
 
     //Fetch Articles
     useEffect(() => {
         async function getFiles() {
-            const files = await getFileList()
-            setArticles(files)
-            setFilteredArticles(files)
+            //Get current user
+            const auth = getAuth(app)
+            const user = auth.currentUser
+    
+            //Throw error if not authenticated
+            if (user === null) {
+                throw new Error('User not authenticated')
+            }
+
+            //Get current user from db
+            const userSnap = await getDoc(doc(db, "user", user.uid))
+
+            //get organisation id from user
+            const organisationId = userSnap.get('organisationId')
+
+            //get organisation 
+            const organisationSnap = await getDoc(doc(db, 'organisation', organisationId))
+
+            //get organisation name
+            const organisationName = organisationSnap.get('name')
+
+            //Get files from org folder
+            const organisationFilesRef = ref(storage, organisationName)
+            const files = await listAll(organisationFilesRef)
+            //Put into object
+            const fileObject = files.items.map(file => ({
+                name: file.name,
+                id: file.fullPath
+            }))
+            //Set to sdtate
+            setArticles(fileObject)
+            setFilteredArticles(fileObject)
             setLoading(false)
         }
         getFiles()
@@ -123,7 +156,7 @@ const Articles = () => {
         const searchTerm = event.target.value.toLowerCase()
 
         const filteredArticles = articles.filter((article) => (
-            article.toLowerCase().includes(searchTerm)
+            article.name.toLowerCase().includes(searchTerm)
         ))
 
         setFilteredArticles(searchTerm ? filteredArticles : articles)
@@ -160,7 +193,7 @@ const Articles = () => {
                         </div>
                         <div className="flex flex-col gap-5 hover:bg-zinc-300 rounded-sm pl-1">
                             {filteredArticles.length > 0 && filteredArticles.map((article) => (
-                                <h3 key={article}>{article}</h3>
+                                <h3 key={article.id}>{article.name}</h3>
                             ))}
                         </div>
                     </div>
