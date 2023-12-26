@@ -5,7 +5,7 @@ import toast from "react-hot-toast"
 import Layout from "@/components/layouts/dashboardLayout"
 import { getAuth } from "firebase/auth"
 import app from "@/lib/firebase/config"
-import { doc, getDoc, getFirestore } from "firebase/firestore"
+import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, where } from "firebase/firestore"
 import isAuth from "@/lib/auth/auth"
 import { getStorage, listAll, ref, uploadBytes } from "firebase/storage"
 import Article from "@/components/Article"
@@ -49,14 +49,17 @@ const Articles = () => {
             //get organisation name
             const organisationName = organisationSnap.get('name')
 
-            //Get files from org folder
-            const organisationFilesRef = ref(storage, organisationName)
-            const files = await listAll(organisationFilesRef)
+            //get organisation documents
+            const q = query(collection(db, 'article'), where('organisationId', '==', organisationId))
+            const organisationArticles = await getDocs(q)
+
             //Put into object
-            const fileObject = files.items.map(file => ({
-                name: file.name,
-                id: file.fullPath
+            const fileObject = organisationArticles.docs.map((doc) => ({
+                id: doc.id,
+                name: doc.data().name,
+                fullPath: doc.data().fullPath
             }))
+            
             //Set to state
             setArticles(fileObject)
             setFilteredArticles(fileObject)
@@ -115,6 +118,7 @@ const Articles = () => {
             //Get count 
             const organisationFiles = await listAll(organisationFilesRef)
 
+            //If exceeds file limit throw error
             if (organisationFiles.items.length > 20) {
                 throw new Error('Maxiumum file number exceeded (20)')
             }
@@ -130,7 +134,6 @@ const Articles = () => {
             }
 
             //Upload to firebase storage
-            
             //Get list of files in mapable form
             const articles: File[] = formData.getAll('file') as File[]
             
@@ -138,7 +141,13 @@ const Articles = () => {
             for (const article of articles) {
                 //Ref to storage location
                 const organisationStorageRef = ref(storage, `${organisationName}/${article.name}`)
-                uploadBytes(organisationStorageRef, article)
+                await uploadBytes(organisationStorageRef, article)
+                //Store in db
+                await addDoc(collection(db, "article"), {
+                    organisationId: organisationId,
+                    name: article.name,
+                    fullPath: organisationStorageRef.fullPath
+                })
             }
 
             // Send the files to your API route | upload to openai

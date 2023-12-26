@@ -12,7 +12,7 @@ interface ArticleProps {
 const Article = ({ article }: ArticleProps) => {
     return (
         <div className="flex justify-between items-center py-2 px-4 rounded hover:bg-zinc-200">
-            <Link href={`/article/${article.id}`}>
+            <Link href={`/articles/${article.id}`}>
                 <h3 className="cursor-pointer w-fit">{article.name}</h3>
             </Link>
             <div className="cursor-pointer">
