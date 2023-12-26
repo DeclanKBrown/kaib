@@ -43,12 +43,6 @@ const Articles = () => {
             //get organisation id from user
             const organisationId = userSnap.get('organisationId')
 
-            //get organisation 
-            const organisationSnap = await getDoc(doc(db, 'organisation', organisationId))
-
-            //get organisation name
-            const organisationName = organisationSnap.get('name')
-
             //get organisation documents
             const q = query(collection(db, 'article'), where('organisationId', '==', organisationId))
             const organisationArticles = await getDocs(q)
