@@ -114,7 +114,7 @@ const Articles = () => {
 
             //If exceeds file limit throw error
             if (organisationFiles.items.length > 20) {
-                throw new Error('Maxiumum file number exceeded (20)')
+                throw new Error('Maximum file number exceeded (20)')
             }
 
             //get assistantId name
@@ -127,23 +127,6 @@ const Articles = () => {
                 formData.append('file', files[i])
             }
 
-            //Upload to firebase storage
-            //Get list of files in mapable form
-            const articles: File[] = formData.getAll('file') as File[]
-            
-            //Map through and upload
-            for (const article of articles) {
-                //Ref to storage location
-                const organisationStorageRef = ref(storage, `${organisationName}/${article.name}`)
-                await uploadBytes(organisationStorageRef, article)
-                //Store in db
-                await addDoc(collection(db, "article"), {
-                    organisationId: organisationId,
-                    name: article.name,
-                    fullPath: organisationStorageRef.fullPath
-                })
-            }
-
             // Send the files to your API route | upload to openai
             const response = await fetch('/api/upload-file', {
                 method: 'POST',
@@ -151,7 +134,31 @@ const Articles = () => {
             })
             
             if (response.ok) {
+                // Parse JSON response
+                response.json().then(data => {
+                    const openaiFiles = data.message
+
+                    //Upload to firebase storage
+                    //Get list of files in mappable form
+                    const articles = formData.getAll('file') as File[]
+                    
+                    //Map through and upload
+                    articles.forEach(async (article, index) => {
+                        console.log('file:', openaiFiles[index])
+                        //Ref to storage location
+                        const organisationStorageRef = ref(storage, `${organisationName}/${article.name}`)
+                        await uploadBytes(organisationStorageRef, article)
+
+                        //Store in db
+                        await addDoc(collection(db, "article"), {
+                            organisationId: organisationId,
+                            name: article.name,
+                            fullPath: organisationStorageRef.fullPath,
+                            openaiFileId: openaiFiles[index].id
+                        })
+                    })
                 toast('Success')
+                })
             }
         } catch (error: unknown) {
             if (error instanceof Error) {
