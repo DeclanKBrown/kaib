@@ -1,33 +1,66 @@
 'use client'
 
-import { getFileList } from "@/lib/firebase/functions"
 import { useEffect, useState, useRef, ChangeEvent } from "react"
 import toast from "react-hot-toast"
 import Layout from "@/components/layouts/dashboardLayout"
 import { getAuth } from "firebase/auth"
 import app from "@/lib/firebase/config"
-import { doc, getDoc, getFirestore } from "firebase/firestore"
+import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, where } from "firebase/firestore"
 import isAuth from "@/lib/auth/auth"
+import { getStorage, listAll, ref, uploadBytes } from "firebase/storage"
+import Article from "@/components/Article"
 
 const db = getFirestore(app)
+const storage = getStorage(app)
+
+interface ArticleType {
+    name: string
+    id: string
+}
 
 const Articles = () => {
 
-    const [articles, setArticles] = useState<string[]>([])
-    const [filteredArticles, setFilteredArticles] = useState<string[]>([])
+    const [articles, setArticles] = useState<ArticleType[]>([])
+    const [filteredArticles, setFilteredArticles] = useState<ArticleType[]>([])
     const [loading, setLoading] = useState<boolean>(true)
-    const [uploadSwitch, setUploadSwitch] = useState<boolean>(false)
+    const [refetchCounter, setRefetchCounter] = useState(0);
 
     //Fetch Articles
     useEffect(() => {
         async function getFiles() {
-            const files = await getFileList()
-            setArticles(files)
-            setFilteredArticles(files)
+            //Get current user
+            const auth = getAuth(app)
+            const user = auth.currentUser
+    
+            //Throw error if not authenticated
+            if (user === null) {
+                throw new Error('User not authenticated')
+            }
+
+            //Get current user from db
+            const userSnap = await getDoc(doc(db, "user", user.uid))
+
+            //get organisation id from user
+            const organisationId = userSnap.get('organisationId')
+
+            //get organisation documents
+            const q = query(collection(db, 'article'), where('organisationId', '==', organisationId))
+            const organisationArticles = await getDocs(q)
+
+            //Put into object
+            const fileObject = organisationArticles.docs.map((doc) => ({
+                id: doc.id,
+                name: doc.data().name,
+                fullPath: doc.data().fullPath
+            }))
+            
+            //Set to state
+            setArticles(fileObject)
+            setFilteredArticles(fileObject)
             setLoading(false)
         }
         getFiles()
-    }, [uploadSwitch])
+    }, [refetchCounter])
 
     //Upload input
     const hiddenFileInput = useRef<HTMLInputElement | null>(null)
@@ -71,6 +104,20 @@ const Articles = () => {
             const organisationSnap = await getDoc(doc(db, 'organisation', organisationId))
 
             //get organisation name
+            const organisationName = organisationSnap.get('name')
+
+            //Get files from org folder
+            const organisationFilesRef = ref(storage, organisationName)
+
+            //Get count 
+            const organisationFiles = await listAll(organisationFilesRef)
+
+            //If exceeds file limit throw error
+            if (organisationFiles.items.length > 20) {
+                throw new Error('Maximum file number exceeded (20)')
+            }
+
+            //get assistantId name
             const assistantId = organisationSnap.get('assistantId')
 
             formData.append('assistantId', assistantId)
@@ -87,8 +134,31 @@ const Articles = () => {
             })
             
             if (response.ok) {
+                const data = await response.json()
+                const openaiFiles = data.message
+            
+                //Upload to firebase storage
+                const articles = formData.getAll('file') as File[]
+            
+                // Map through and upload
+                const uploadPromises = articles.map(async (article, index) => {
+                    //Ref to storage location
+                    const organisationStorageRef = ref(storage, `${organisationName}/${article.name}`)
+                    await uploadBytes(organisationStorageRef, article)
+            
+                    //Store in db
+                    await addDoc(collection(db, "article"), {
+                        organisationId: organisationId,
+                        name: article.name,
+                        fullPath: organisationStorageRef.fullPath,
+                        openaiFileId: openaiFiles[index].id
+                    })
+                })
+            
+                await Promise.all(uploadPromises)
+            
                 toast('Success')
-            }
+            }            
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.error('handleUpload', error)
@@ -98,7 +168,7 @@ const Articles = () => {
                 toast('An unexpected error occurred.')
             }
         } finally {
-            setUploadSwitch(!uploadSwitch)
+            setRefetchCounter(prev => prev + 1)
         }
     }
 
@@ -107,7 +177,7 @@ const Articles = () => {
         const searchTerm = event.target.value.toLowerCase()
 
         const filteredArticles = articles.filter((article) => (
-            article.toLowerCase().includes(searchTerm)
+            article.name.toLowerCase().includes(searchTerm)
         ))
 
         setFilteredArticles(searchTerm ? filteredArticles : articles)
@@ -122,7 +192,7 @@ const Articles = () => {
                             <h1 className="text-xl">Articles</h1>
                             <div className="flex flex-row">
                                 <button 
-                                    className="bg-zinc-300 py-1 px-3 rounded-sm"
+                                    className="bg-zinc-300 py-1 px-3 rounded hover:opacity-90"
                                     onClick={handleClick}
                                 >Add New</button>
                                 <input 
@@ -137,14 +207,14 @@ const Articles = () => {
                         <div className="flex mb-12">
                             <input 
                                 type="text" 
-                                className="border-2 border-zinc-300 rounded-sm text-sm pl-1 py-1" 
+                                className="border-2 border-zinc-300 rounded text-sm pl-1 pr-10 py-2 w-72" 
                                 placeholder="Search"
                                 onChange={(event) => handleSearch(event)}
                             ></input>
                         </div>
-                        <div className="flex flex-col gap-5 hover:bg-zinc-300 rounded-sm pl-1">
+                        <div className="flex flex-col rounded-sm pl-1">
                             {filteredArticles.length > 0 && filteredArticles.map((article) => (
-                                <h3 key={article}>{article}</h3>
+                                <Article key={article.id} article={article} setRefetchCounter={setRefetchCounter}/>
                             ))}
                         </div>
                     </div>
