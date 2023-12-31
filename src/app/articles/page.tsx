@@ -23,7 +23,7 @@ const Articles = () => {
     const [articles, setArticles] = useState<ArticleType[]>([])
     const [filteredArticles, setFilteredArticles] = useState<ArticleType[]>([])
     const [loading, setLoading] = useState<boolean>(true)
-    const [uploadSwitch, setUploadSwitch] = useState<boolean>(false)
+    const [refetchCounter, setRefetchCounter] = useState(0);
 
     //Fetch Articles
     useEffect(() => {
@@ -60,7 +60,7 @@ const Articles = () => {
             setLoading(false)
         }
         getFiles()
-    }, [uploadSwitch])
+    }, [refetchCounter])
 
     //Upload input
     const hiddenFileInput = useRef<HTMLInputElement | null>(null)
@@ -134,32 +134,31 @@ const Articles = () => {
             })
             
             if (response.ok) {
-                // Parse JSON response
-                response.json().then(data => {
-                    const openaiFiles = data.message
-
-                    //Upload to firebase storage
-                    //Get list of files in mappable form
-                    const articles = formData.getAll('file') as File[]
-                    
-                    //Map through and upload
-                    articles.forEach(async (article, index) => {
-                        console.log('file:', openaiFiles[index])
-                        //Ref to storage location
-                        const organisationStorageRef = ref(storage, `${organisationName}/${article.name}`)
-                        await uploadBytes(organisationStorageRef, article)
-
-                        //Store in db
-                        await addDoc(collection(db, "article"), {
-                            organisationId: organisationId,
-                            name: article.name,
-                            fullPath: organisationStorageRef.fullPath,
-                            openaiFileId: openaiFiles[index].id
-                        })
+                const data = await response.json()
+                const openaiFiles = data.message
+            
+                //Upload to firebase storage
+                const articles = formData.getAll('file') as File[]
+            
+                // Map through and upload
+                const uploadPromises = articles.map(async (article, index) => {
+                    //Ref to storage location
+                    const organisationStorageRef = ref(storage, `${organisationName}/${article.name}`)
+                    await uploadBytes(organisationStorageRef, article)
+            
+                    //Store in db
+                    await addDoc(collection(db, "article"), {
+                        organisationId: organisationId,
+                        name: article.name,
+                        fullPath: organisationStorageRef.fullPath,
+                        openaiFileId: openaiFiles[index].id
                     })
-                toast('Success')
                 })
-            }
+            
+                await Promise.all(uploadPromises)
+            
+                toast('Success')
+            }            
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.error('handleUpload', error)
@@ -169,7 +168,7 @@ const Articles = () => {
                 toast('An unexpected error occurred.')
             }
         } finally {
-            setUploadSwitch(!uploadSwitch)
+            setRefetchCounter(prev => prev + 1)
         }
     }
 
@@ -215,7 +214,7 @@ const Articles = () => {
                         </div>
                         <div className="flex flex-col rounded-sm pl-1">
                             {filteredArticles.length > 0 && filteredArticles.map((article) => (
-                                <Article key={article.id} article={article} />
+                                <Article key={article.id} article={article} setRefetchCounter={setRefetchCounter}/>
                             ))}
                         </div>
                     </div>
