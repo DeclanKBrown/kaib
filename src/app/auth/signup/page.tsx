@@ -26,7 +26,7 @@ export default function Signup() {
             const email = formData.get('email') as string
             const password = formData.get('password') as string
             
-            //sign up with firbase
+            //sign up with firebase
             const auth = getAuth(app)
             setPersistence(auth, browserSessionPersistence)
             const userCredential = await createUserWithEmailAndPassword(auth, email, password)
