@@ -4,6 +4,8 @@ import app from "@/lib/firebase/config"
 import { User, getAuth, onAuthStateChanged } from "firebase/auth"
 import { doc, getDoc, getFirestore } from "firebase/firestore"
 import { useEffect, useState } from "react"
+import Skeleton from "react-loading-skeleton"
+import 'react-loading-skeleton/dist/skeleton.css'
 
 const db = getFirestore(app)
 
@@ -51,7 +53,20 @@ export default function UserInfo() {
                 </div>
             </div>
         ) : (
-            <></>
+            <div className="flex w-full items-center">
+                <div className="flex w-full items-center gap-2 rounded-lg p-2 text-sm hover:bg-zinc-300">
+                    <div className="flex-shrink-0">
+                    <div className="flex items-center justify-center overflow-hidden rounded-full">
+                        <div className="relative flex">
+                            <Skeleton circle={true} />
+                        </div>
+                    </div>
+                    </div>
+                    <div className="relative -top-px grow -space-y-px overflow-hidden text-ellipsis text-left text-gray-700">
+                        <Skeleton count={2} />
+                    </div>
+                </div>
+            </div>
         )
     )
 }   

@@ -9,6 +9,8 @@ import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, where } 
 import isAuth from "@/lib/auth/auth"
 import { getStorage, listAll, ref, uploadBytes } from "firebase/storage"
 import Article from "@/components/Article"
+import Skeleton from "react-loading-skeleton"
+import 'react-loading-skeleton/dist/skeleton.css'
 
 const db = getFirestore(app)
 const storage = getStorage(app)
@@ -23,7 +25,8 @@ const Articles = () => {
     const [articles, setArticles] = useState<ArticleType[]>([])
     const [filteredArticles, setFilteredArticles] = useState<ArticleType[]>([])
     const [loading, setLoading] = useState<boolean>(true)
-    const [refetchCounter, setRefetchCounter] = useState(0);
+    const [refetchCounter, setRefetchCounter] = useState(0)
+    const [uploading, setUploading] = useState(false)
 
     //Fetch Articles
     useEffect(() => {
@@ -58,6 +61,7 @@ const Articles = () => {
             setArticles(fileObject)
             setFilteredArticles(fileObject)
             setLoading(false)
+            setUploading(false)
         }
         getFiles()
     }, [refetchCounter])
@@ -80,7 +84,7 @@ const Articles = () => {
 
     //Send file to server
     const handleUpload = async (files: FileList) => {
-        setLoading(true)
+        setUploading(true)
         try {
             //Get current user
             const auth = getAuth(app)
@@ -217,6 +221,16 @@ const Articles = () => {
                                 <Article key={article.id} article={article} setRefetchCounter={setRefetchCounter}/>
                             ))}
                         </div>
+                        {loading && (
+                            <div className="flex flex-col rounded-sm pl-1">
+                                <Skeleton count={20} style={{ paddingTop: '1rem'}}></Skeleton>
+                            </div>
+                        )}
+                        {uploading && (
+                            <div className="flex flex-col rounded-sm pl-1">
+                                <Skeleton count={1} style={{ paddingTop: '1rem'}}></Skeleton>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
