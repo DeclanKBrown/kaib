@@ -4,6 +4,7 @@ import Messages from './Messages'
 import { createThread } from '@/lib/openai/functions'
 import React, { useEffect, useState } from 'react'
 import { experimental_useAssistant } from 'ai/react'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 const Chat = () => {
   //Create thread

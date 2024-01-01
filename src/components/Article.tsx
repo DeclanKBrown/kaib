@@ -40,7 +40,6 @@ const Article = ({ article, setRefetchCounter }: ArticleProps) => {
 
             //Get article doc in db
             const articleDoc = await getDoc(doc(db, "article", article.id))
-            console.log('articleDoc:', articleDoc)
 
             //get openai file id 
             const openaiFileId = articleDoc.get('openaiFileId')
