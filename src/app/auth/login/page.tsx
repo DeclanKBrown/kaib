@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { FormEvent } from "react"
 import toast from "react-hot-toast"
 
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth"
+import { browserSessionPersistence, getAuth, signInWithEmailAndPassword } from "firebase/auth"
 import app from "@/lib/firebase/config"
 import { doc, getDoc, getFirestore, } from "firebase/firestore"
 
@@ -25,8 +25,9 @@ export default function Login() {
             const email = formData.get('email') as string
             const password = formData.get('password') as string
 
-            //try log in with firbase
+            //try log in with firebase
             const auth = getAuth(app)
+            auth.setPersistence(browserSessionPersistence)
             await signInWithEmailAndPassword(auth, email, password)
 
             toast('Logged in')
