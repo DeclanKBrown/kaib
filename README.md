@@ -10,3 +10,5 @@ Kaib – a user-friendly solution that makes querying a knowledge base feel natu
 - Knowledge base across organisation
 
 # Watch example here
+https://github.com/DeclanKBrown/kaib/assets/135834907/a7691eeb-5102-4d84-be8f-88af7a5e341f
+
